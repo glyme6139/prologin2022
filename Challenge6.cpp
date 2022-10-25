@@ -6,6 +6,8 @@
 
 std::string sDebugTree = "|   ";
 
+bool bDebug = false;
+
 float HueToRgb(float p, float q, float t)
 {
     if (t < 0.0f) t += 1.0f;
@@ -71,27 +73,33 @@ std::array<int,2> refroidissement(int n, int m, int k, int a, int b, std::vector
     int iPipeCount = 0;
     std::set<std::vector<int>> s(tuyaux.cbegin(), tuyaux.cend());
     tuyaux = std::vector<std::vector<int>>(s.cbegin(), s.cend());
-    if(a == b || k < 0) return std::array<int,2>{0,0};
+    if(a == b || k < 0 || iIndentLevel > 2000) return std::array<int,2>{0,0};
     int c = 0;
     for(auto &i : tuyaux) {
         if(i[0] == a && i[1] == b) {
-            PrintColorIndent(m,iIndentLevel);
-            std::cout << "Reached end point testing path from " << a << " to " << b << " doing -" << i[2];
+            if(bDebug) {
+                PrintColorIndent(m,iIndentLevel);
+                std::cout << "Reached end point testing path from " << a << " to " << b << " doing -" << i[2];
+            }
             if(i[2] >= k && 1 < iBestLenght) {
-                std::cout << " and is satisfying" << std::endl; 
+                if(bDebug) std::cout << " and is satisfying" << std::endl; 
                 return std::array<int,2>{i[2],1}; 
             }
-            std::cout << std::endl;
+            if(bDebug) std::cout << std::endl;
         }
         if(i[0] == a) {
             std::vector<std::vector<int>> vecAvailableTuyaux = tuyaux;
-            PrintColorIndent(m,iIndentLevel);
-            std::cout << "Testing path from " << i[0] << " to " << i[1] << " path must do -" << k <<  std::endl; 
+            if(bDebug) {
+                PrintColorIndent(m,iIndentLevel);
+                std::cout << "Testing path from " << i[0] << " to " << i[1] << " path must do -" << k <<  std::endl; 
+            }
 
             std::array<int,2> arrScore = refroidissement(n,m,k-i[2],i[1],b,vecAvailableTuyaux,iIndentLevel+1); 
             if(arrScore[0]+i[2] >= k && arrScore[1] < iBestLenght) {
-                PrintColorIndent(m,iIndentLevel);
-                std::cout << "--->Path " << i[0] << " to " << i[1] << " satisfied requirement -" << k << " with length of " << arrScore[1]+1 << std::endl; 
+                if(bDebug) {
+                    PrintColorIndent(m,iIndentLevel);
+                    std::cout << "--->Path " << i[0] << " to " << i[1] << " satisfied requirement -" << k << " with length of " << arrScore[1]+1 << std::endl; 
+                }
                 iBestLenght = arrScore[1];
                 iCooling = i[2]+arrScore[0];
             }
@@ -100,14 +108,17 @@ std::array<int,2> refroidissement(int n, int m, int k, int a, int b, std::vector
     }
 
     
-    PrintColorIndent(m,iIndentLevel);
-    std::cout << "--->Best path for " << a << " to " << b << " found did -" << iCooling << " in " << iBestLenght+1 << std::endl;
-    PrintColorIndent(m,iIndentLevel,true);
+    if(bDebug) { 
+        PrintColorIndent(m,iIndentLevel);
+        std::cout << "--->Best path for " << a << " to " << b << " found did -" << iCooling << " in " << iBestLenght+1 << std::endl;
+        PrintColorIndent(m,iIndentLevel,true);
+    }
 
     return (iBestLenght == INT32_MAX) ? std::array<int,2>{-1,-1} : std::array<int,2>{iCooling,iBestLenght+1};
 }
 
 int main() {
+    // std::cout << "\033[38;2;192;192;192m";
     int n; ///< Le nombre de points
     std::cin >> n;
     int m; ///< Le nombre de tuyaux
