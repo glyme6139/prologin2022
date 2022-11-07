@@ -52,10 +52,7 @@ void PrintColorIndent(int m, int iIndentLevel,bool endl = false) {
     }
     std::array<int,4> color = HslToRgba(((float)360/(m+1)*(iIndentLevel))/360,1,0.5);
     std::cout << "\033[38;2;"<< abs(color[0]-1) <<";" << abs(color[1]-1) << ";" << abs(color[2]-1) << "m";            
-    
-
     if(endl) std::cout << std::endl;
-
 }
 
 /// \param n Le nombre de points
@@ -135,5 +132,6 @@ int main() {
         for (int& j : i)
             std::cin >> j;
     }
+    if(n < 1 || n > 20 || m < 0 || m > 100000 || k < 0 || k > 100) return 0;
     std::cout << refroidissement(n, m, k, a, b, tuyaux)[1] << std::endl;
 }
